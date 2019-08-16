@@ -1,0 +1,42 @@
+{% set pageTitle = 'Header' %}
+{% set pageDescription = 'The NHS header shows users that they are on a NHS website and which service or organisation they are using.' %}
+
+{% extends 'includes/layout.njk' %}
+
+{% from 'action-link/macro.njk' import actionLink %}
+{% from 'includes/design-example.njk' import designExample %}
+
+{% block breadcrumb %}
+{{ breadcrumb({
+  items: [
+    {
+      href: "/service-manual/",
+      text: "Home"
+    }
+  ],
+  href: "/service-manual/styles-components-patterns",
+  text: "Styles, components and patterns"
+}) }}
+{% endblock %}
+
+{% block body %}
+<div class="nhsuk-grid-row">
+  <div class="nhsuk-grid-column-two-thirds">
+    <h1>{{ pageTitle }}</h1>
+    <p class="nhsuk-lede-text">{{ pageDescription }}</p>
+  </div>
+  <div class="nhsuk-grid-column-one-third">
+    <div class="app-github">
+      <h2>Contributors</h2>
+      <ul id="contributors" class="app-contributors"></ul>
+      <h2>Related issues</h2>
+      <ul id="issues" class="app-issues"></ul>
+    </div>
+  </div>
+</div>
+<div class="nhsuk-grid-row">
+  <div class="nhsuk-grid-column-full">
+
+  </div>
+</div>
+{% endblock %}
