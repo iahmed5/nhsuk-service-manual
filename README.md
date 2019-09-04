@@ -12,6 +12,17 @@ Clone the repo: `git clone https://github.com/nhsuk/nhsuk-service-manual.git nhs
 
 Run the project in development mode `npm run watch` and visit <a href="http://localhost:3000">http://localhost:3000</a>.
 
+## Environment variables
+
+Environment variables are expected to be managed by the environment in which the application is being run.
+
+| Variable      | Description       | Default         | Required  |
+| ------------- | ----------------- | --------------          | --------- |
+| `BASE_URL`      | Domain of the environment          | https://beta.nhs.uk/service-manual |
+| `NODE_ENV`      | Node environment. Recommend environments: `production`, `staging` and `development`  |  development            |
+| `PORT`          | Server port       |  3000                   |
+| `GITHUB_KEY`          | [GitHub API authentication](https://developer.github.com/v3/#authentication) to use the GitHub API functionality in the manual. |         | No |
+
 ## Get in touch
 
 The NHS digital service manual is maintained by NHS Digital. [Email us](mailto:service-manual@nhs.net), open a [Github issue](https://github.com/nhsuk/nhsuk-service-manual/issues/new) or get in touch on the [NHS digital service manual Slack workspace](https://nhs-service-manual.slack.com/join/shared_invite/enQtNTIyOTEyNjU3NDkyLWUwOWM5MWY5MGRhYTYxZmY4ZWI0NDA1N2NhNTRiMGY3MTQxNjk5YTc3ZTAzMTA4YmE3ZDAxYmQ3MTQxNDgzOTQ).

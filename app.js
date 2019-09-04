@@ -7,6 +7,8 @@ const compression = require('compression');
 const express = require('express');
 const highlightjs = require('highlight.js');
 const nunjucks = require('nunjucks');
+const Octokit = require('@octokit/rest');
+const _ = require('lodash');
 
 // Local dependencies
 const authentication = require('./middleware/authentication');
@@ -75,42 +77,65 @@ app.get('/service-manual/design-example/:example', (req, res) => {
   res.render('includes/design-example-wrapper.njk', { body: exampleHtml });
 });
 
-/*
-app.get('/service-manual/search', (req, res) => {
-  var query = req.query['search-field'] || '';
-  res.render('includes/search.njk', { results: pageIndex.search(query), query: query });
-});
-
-app.get('/service-manual/suggestions', (req, res) => {
-  res.set({ 'Content-Type': 'application/json' });
-  res.send(JSON.stringify(pageIndex.search(req.query.search)));
-});
-*/
-
 app.get('/', (req, res) => {
   res.redirect('/service-manual');
 });
 
-// The practices pages have moved or been deleted
-// Temporary redirects incase anyone still visits /practices pages
-app.get('/service-manual/practices/create-content-for-users-with-low-health-literacy', (req, res) => {
-  res.redirect('/service-manual/content/health-literacy');
+const octokit = Octokit({
+  auth: config.githubKey,
+  baseUrl: 'https://api.github.com',
+  userAgent: 'NHS digital service manual',
 });
 
-app.get('/service-manual/practices/create-content-for-users-with-low-health-literacy/use-a-readability-tool-to-prioritise-content', (req, res) => {
-  res.redirect('/service-manual/content/health-literacy/use-a-readability-tool-to-prioritise-content');
+app.get('/service-manual/components/:component', async (req, res) => {
+  const component = req.params.component;
+
+  // Get contributors to this component
+  octokit.repos.listCommits({
+    owner: 'nhsuk',
+    path: `packages/components/${component}`,
+    repo: 'nhsuk-frontend',
+  }).then(({ data }) => {
+    const commits = data;
+    const filterUniqueCommits = _.uniqBy(commits, 'author.login');
+    return filterUniqueCommits.map((commit) => {
+      return console.log(commit.author.login);
+    });
+  });
+
+  // Get issues related to this component
+  octokit.issues.listForRepo({
+    owner: 'nhsuk',
+    repo: 'nhsuk-frontend',
+  }).then(({ data }) => {
+    const issues = data;
+    // Filter issues by the component name in issue title
+    const filteredIssues = issues.filter(issue => issue.title.toLowerCase().includes(component.toLowerCase()));
+    return filteredIssues.map((issue) => {
+      return console.log(`${issue.title} - ${issue.html_url}`);
+    });
+  });
+
+  // Render component page
+  res.render(`components/${component}`);
 });
 
-app.get('/service-manual/practices', (req, res) => {
-  res.redirect('/service-manual');
-});
+app.get('/service-manual/community/backlog', async (req, res) => {
+  // Get issues in the service manual backlog
+  octokit.issues.listForRepo({
+    labels: 'proposed,todo',
+    owner: 'nhsuk',
+    repo: 'nhsuk-service-manual-backlog',
+  }).then(({ data }) => {
+    const issues = data;
+    return issues.map((issue) => {
+      console.log(issue);
+      return console.log(`${issue.title} - ${issue.html_url}`);
+    });
+  });
 
-app.get('/service-manual/practices/make-your-service-accessible', (req, res) => {
-  res.redirect('/service-manual/accessibility');
-});
-
-app.get('/service-manual/content/writing-for-accessibility', (req, res) => {
-  res.redirect('/service-manual/accessibility/content');
+  // Render component page
+  res.render('community/backlog');
 });
 
 // Automatically route pages
